@@ -9,15 +9,21 @@
     // Shape of the file was obtained by using HERE Geocoder API.
     // It is possible to customize look and feel of the objects.
     var reader = new H.data.geojson.Reader('data', {
-        // C:\Users\jacob\Documents\Repos\WindRider\data\sellindge.geojson
         // This function is called each time parser detects a new map object
         style: function (mapObject) {
         // Parsed geo objects could be styled using setStyle method
         if (mapObject instanceof H.map.Polygon) {
+            console.log('Polygon Found!')
             mapObject.setStyle({
             fillColor: 'rgba(255, 0, 0, 0.5)',
             strokeColor: 'rgba(0, 0, 255, 0.2)',
             lineWidth: 3
+            });
+        }
+        else if (mapObject instanceof H.map.Polyline) {
+            console.log('Polyline Found!');
+            mapObject.setStyle({
+                lineWidth: 3
             });
         }
         }

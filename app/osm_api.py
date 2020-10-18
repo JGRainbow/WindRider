@@ -46,3 +46,26 @@ def get_road_nodes_from_bbox(lat_south,
     api = overpy.Overpass()
     result_nodes = api.query(f"way({lat_south},{lon_west},{lat_north},{lon_east})['highway'~'(primary|secondary|tertiary)$'];node(w);out;")
     return result_nodes.nodes
+
+
+def get_road_ways_json_from_bbox(lat_south,
+                                 lon_west,
+                                 lat_north,
+                                 lon_east):
+    api = overpy.Overpass()
+    result_ways = api.query(f"way({lat_south},{lon_west},{lat_north},{lon_east})['highway'~'(primary|secondary|tertiary)$'];out;")
+    pass
+
+
+# api = overpy.Overpass()
+# result = api.query("[out:json];node(50.745,7.17,50.75,7.18);out;")
+# # result_ways = api.query(f"[out:json];way(51.1040,0.9455,51.1206,0.9964)['highway'~'(primary|secondary|tertiary)$'];out;")
+# # result = api.parse_json(r'https://www.overpass-api.de/api/interpreter?data=[out:json];node[highway=speed_camera](43.46669501043081,-5.708215989569187,43.588927989569186,-5.605835010430813);out%20meta;')
+# result.nodes
+import requests
+
+api = overpy.Overpass()
+url = r"https://www.overpass-api.de/api/interpreter?data=[out:json];way(51.1040,0.9455,51.1206,0.9964)['highway'~'(primary|secondary|tertiary)$'];out;"
+response = requests.get(url)
+json = response.json()
+print(len(json))
