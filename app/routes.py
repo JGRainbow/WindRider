@@ -41,8 +41,8 @@ def map_func():
 @app.route('/data')
 def map_data():
     # geojson = get_road_ways_json_from_bbox(51.1040,0.9455,51.1206,0.9964)
-    nodes = get_road_nodes_from_bbox(51.1040,0.9455,51.1206,0.9964)
-    ways = get_road_ways_from_bbox(51.1040,0.9455,51.1206,0.9964)
+    nodes = get_road_nodes_from_bbox(51.0862,0.9360,51.1188,1.0677)
+    ways = get_road_ways_from_bbox(51.0862,0.9360,51.1188,1.0677)
     geojson = create_feature_collection(ways, nodes)
     return geojson
 

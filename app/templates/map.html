@@ -21,15 +21,10 @@
             });
         }
         else if (mapObject instanceof H.map.Polyline) {
-            console.log('Polyline Found!');
-            geometry = mapObject.getGeometry()
-            console.log(geometry)
-            visibility = mapObject.getVisibility()
-            console.log(visibility)
             mapObject.setStyle({
-            fillColor: 'rgba(255, 0, 0, 1)',
-            strokeColor: 'rgba(0, 0, 255, 1)',
-            lineWidth: 3
+            fillColor: 'rgba(0, 0, 255, 0.5)',
+            strokeColor: 'rgba(0, 0, 255, 0.5)',
+            lineWidth: 5
             });
         }
         }
