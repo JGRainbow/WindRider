@@ -34,3 +34,8 @@ def map_func():
     lon = request.args.get('lon', default=1, type=float)
     print(f'Lat: {lat} \t Lon: {lon}')
     return render_template('map.html', lat=lat, lon=lon, debug=True)   
+
+
+@app.route('/data')
+def map_data():
+    return render_template('data.json')
