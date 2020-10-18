@@ -6,29 +6,42 @@
 <script>	
       // Initialize the platform object:
       
-      var platform = new H.service.Platform({
+    var platform = new H.service.Platform({
         'apikey': '9HXnYe3FieeH_k-QYuPTquU600_UXKWXU7iD-8wjfTg'
-      });
-  
-       const lat = {{ lat|safe }};
-       const lon = {{ lon|safe }};
-    
-	// Obtain the default map types from the platform object
-      var maptypes = platform.createDefaultLayers();
+    });
 
-      // Instantiate (and display) a map object:
-      var map = new H.Map(
+    const lat = {{ lat|safe }};
+    const lon = {{ lon|safe }};
+
+    // Obtain the default map types from the platform object
+    var defaultLayers = platform.createDefaultLayers();
+
+    // Instantiate (and display) a map object:
+    var map = new H.Map(
         document.getElementById('mapContainer'),
-        maptypes.vector.normal.map,
+        // maptypes.vector.normal.map,
+        defaultLayers.vector.normal.map,
         {
-          zoom: 13,
-          center: { lat: lat, lng: lon }  
+        zoom: 13,
+        center: { lat: lat, lng: lon }  
         });
-		
-	// var marker = new H.map.Marker({ lat: lat, lng: lon });
-		
-	// // Add the marker to the map:
-	// map.addObject(marker);
-		
+
+    window.addEventListener('resize', () => map.getViewPort().resize());
+
+
+    // Step 3: make the map interactive
+    // MapEvents enables the event system
+    // Behavior implements default interactions for pan/zoom (also on mobile touch environments)
+    var behavior = new H.mapevents.Behavior(new H.mapevents.MapEvents(map));
+
+    // Create the default UI components
+    var ui = H.ui.UI.createDefault(map, defaultLayers);
+
+
+    // var marker = new H.map.Marker({ lat: lat, lng: lon });
+
+    // // Add the marker to the map:
+    // map.addObject(marker);
+
 </script>
 {% endblock %}
