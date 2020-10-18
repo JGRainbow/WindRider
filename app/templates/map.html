@@ -22,8 +22,14 @@
         }
         else if (mapObject instanceof H.map.Polyline) {
             console.log('Polyline Found!');
+            geometry = mapObject.getGeometry()
+            console.log(geometry)
+            visibility = mapObject.getVisibility()
+            console.log(visibility)
             mapObject.setStyle({
-                lineWidth: 3
+            fillColor: 'rgba(255, 0, 0, 1)',
+            strokeColor: 'rgba(0, 0, 255, 1)',
+            lineWidth: 3
             });
         }
         }
@@ -34,7 +40,9 @@
 
     // Add layer which shows GeoJSON data on the map
     map.addLayer(reader.getLayer());
+    // map.addObject(reader.getObject());
     }
+
 
 
       // Initialize the platform object:
