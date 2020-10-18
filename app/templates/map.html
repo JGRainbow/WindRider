@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="width: 100%; height: 100%" id="mapContainer"></div>
+
+<script>	
+      // Initialize the platform object:
+      
+      var platform = new H.service.Platform({
+        'apikey': '9HXnYe3FieeH_k-QYuPTquU600_UXKWXU7iD-8wjfTg'
+      });
+  
+       const lat = {{ lat|safe }};
+       const lon = {{ lon|safe }};
+    
+	// Obtain the default map types from the platform object
+      var maptypes = platform.createDefaultLayers();
+
+      // Instantiate (and display) a map object:
+      var map = new H.Map(
+        document.getElementById('mapContainer'),
+        maptypes.vector.normal.map,
+        {
+          zoom: 13,
+          center: { lat: lat, lng: lon }  
+        });
+		
+	// var marker = new H.map.Marker({ lat: lat, lng: lon });
+		
+	// // Add the marker to the map:
+	// map.addObject(marker);
+		
+</script>
+{% endblock %}

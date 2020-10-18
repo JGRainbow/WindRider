@@ -1,14 +1,14 @@
-from flask import render_template
-# from osm_api import get_road_nodes_from_bbox, get_road_ways_from_bbox
-# from angle_match import calculate_way_geometry, get_angle_match
+from flask import render_template, request
 from app import app
 from app.osm_api import get_road_ways_from_bbox, get_road_nodes_from_bbox
 from app.angle_match import calculate_way_geometry, get_angle_match
+
 
 @app.route('/')
 @app.route('/index')
 def index():
     return render_template('index.html')
+
 
 @app.route('/region/<region_name>')
 def region(region_name):
@@ -26,3 +26,11 @@ def region(region_name):
             best_match = angle_match
     
     return render_template('region.html', region=region_name, best_match=best_match)
+
+
+@app.route('/map')
+def map_func():
+    lat = request.args.get('lat', default=51.1, type=float)
+    lon = request.args.get('lon', default=1, type=float)
+    print(f'Lat: {lat} \t Lon: {lon}')
+    return render_template('map.html', lat=lat, lon=lon, debug=True)   
