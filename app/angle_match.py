@@ -1,44 +1,56 @@
-import pyproj
 from collections import namedtuple
 from itertools import tee
-import overpy
 from typing import List
+
+import overpy
+import pyproj
+from geojson import Feature, FeatureCollection
 from numpy import cos, pi
+from shapely.geometry import LineString
 
-
-SegmentGeometry = namedtuple('SegmentGeometry', 'angle distance')
+PolarCoord = namedtuple('PolarCoord', 'bearing distance')
 GEODESIC = pyproj.Geod(ellps='WGS84')
 
 
-def calculate_segment_geometry(start_coord, end_coord,
-                               geodesic: pyproj.Geod = GEODESIC):
-    fwd_bearing, _, distance = geodesic.inv(*start_coord, *end_coord)
-    return SegmentGeometry(fwd_bearing, distance)
-
-
-def calculate_way_geometry_from_coord_list(coord_list, 
-                                           geodesic: pyproj.Geod = GEODESIC):
-    way_geometry =  [calculate_segment_geometry(start_coord, end_coord)
-                          for (start_coord, end_coord) in pairwise(coord_list)]
-    return way_geometry
-
-
-def calculate_way_geometry(way: overpy.Way,
-                           nodes: List[overpy.Node],
-                           geodesic: pyproj.Geod = GEODESIC):
+def create_linestring_from_way(way: overpy.Way, nodes):
     node_id_list = get_all_node_ids_on_way(way)
     node_list = select_nodes_from_node_ids(nodes, node_id_list)
     coord_list = convert_node_list_to_coord_list(node_list)
-    return calculate_way_geometry_from_coord_list(coord_list, 
-                                                  geodesic=geodesic)
-       
+    linestring = LineString(coord_list)
+    return linestring
 
-def get_angle_match(segment_list: List[SegmentGeometry], target_angle):
-    weighted_angle, total_distance = 0, 0
-    for segment in segment_list:
-        weighted_angle += abs(segment.distance * cos((180 / pi) * target_angle - segment.angle))
+
+def create_feature_collection(ways, nodes, target_bearing, crs="EPSG:4326"):
+    # TODO: Make this a list comprehension
+    features = []
+    for way in ways:
+        linestring = create_linestring_from_way(way, nodes)
+        match = calculate_bearing_match_of_linestring(linestring, target_bearing)
+        feature = Feature(geometry=linestring, properties={'match': match})
+        features.append(feature)
+    fc = FeatureCollection(features, crs=crs)
+    return fc
+
+
+def convert_cartesian_linestring_to_polar_linestring(linestring: LineString):
+    polar_linestrings = [convert_cartesian_coords_to_polar_coords(start_coord, end_coord)
+                         for (start_coord, end_coord) in pairwise(linestring.coords)]
+    return polar_linestrings
+
+
+def convert_cartesian_coords_to_polar_coords(start_coord, end_coord,
+                                             geodesic: pyproj.Geod = GEODESIC):
+    fwd_bearing, _, distance = geodesic.inv(*start_coord, *end_coord)
+    return PolarCoord(fwd_bearing, distance)
+
+
+def calculate_bearing_match_of_linestring(linestring: LineString, target_bearing):
+    polar_linestrings = convert_cartesian_linestring_to_polar_linestring(linestring)
+    weighted_bearing, total_distance = 0, 0
+    for segment in polar_linestrings:
+        weighted_bearing += abs(segment.distance * cos((180 * pi) * target_bearing - segment.bearing))
         total_distance += segment.distance
-    return weighted_angle / total_distance
+    return weighted_bearing / total_distance
 
 
 def select_nodes_from_node_ids(nodes: List[overpy.Node], node_ids):
@@ -46,7 +58,7 @@ def select_nodes_from_node_ids(nodes: List[overpy.Node], node_ids):
 
 
 def convert_node_list_to_coord_list(node_list):
-    return [(node.lat, node.lon) for node in node_list]
+    return [(node.lon, node.lat) for node in node_list]
 
 
 def get_all_node_ids_on_way(way: overpy.Way):
@@ -58,21 +70,3 @@ def pairwise(iterable):
     a, b = tee(iterable)
     next(b, None)
     return zip(a, b)    
-
-
-if __name__ == '__main__':
-    import overpy
-
-    WAY_NUM = 12
-
-    api = overpy.Overpass()
-    result_ways = api.query("way(51.1040,0.9455,51.1206,0.9964)['highway'~'(primary|secondary|tertiary)$'];out;")
-    result_nodes = api.query("way(51.1040,0.9455,51.1206,0.9964)['highway'~'(primary|secondary|tertiary)$'];node(w);out;")
-    ways = result_ways.ways
-    nodes = result_nodes.nodes
-
-    way = ways[WAY_NUM]
-    way_geometry = calculate_way_geometry(way, nodes)
-    print(way_geometry)
-    angle_match = get_angle_match(way_geometry, 50)
-    print(angle_match)

@@ -21,9 +21,13 @@
             });
         }
         else if (mapObject instanceof H.map.Polyline) {
+            data = mapObject.getData()
+            console.log(data)
+            console.log(data.properties.match)
+            var match = data.properties.match
             mapObject.setStyle({
-            fillColor: 'rgba(0, 0, 255, 0.5)',
-            strokeColor: 'rgba(0, 0, 255, 0.5)',
+            fillColor: `rgba(${255 * (1 - match)}, 0, 255, 0.8)`,
+            strokeColor: `rgba(${255 * (1 - match)}, 0, 255, 0.8)`,
             lineWidth: 5
             });
         }
