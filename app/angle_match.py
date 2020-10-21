@@ -2,6 +2,7 @@ from collections import namedtuple
 from itertools import tee
 from typing import List
 
+import numpy as np
 import overpy
 import pyproj
 from geojson import Feature, FeatureCollection
@@ -25,6 +26,27 @@ def create_feature_collection(ways, nodes, target_bearing, crs="EPSG:4326"):
     features = []
     for way in ways:
         linestring = create_linestring_from_way(way, nodes)
+        match = calculate_bearing_match_of_linestring(linestring, target_bearing)
+        feature = Feature(geometry=linestring, properties={'match': match})
+        features.append(feature)
+    fc = FeatureCollection(features, crs=crs)
+    return fc
+
+
+def create_linestring_star(num_lines, centre_lon=0.958577, centre_lat=51.109754, length=0.025):
+    linestrings = []
+    for angle in np.arange(0, 360, 360 / num_lines):
+        end_lon = np.sin((pi / 180) * angle) * length + centre_lon
+        end_lat = np.cos((pi / 180) * angle) * length + centre_lat
+        linestring = LineString([(centre_lon, centre_lat),
+                                  (end_lon, end_lat)])
+        linestrings.append(linestring)
+    return linestrings           
+
+
+def create_test_feature_collections(linestrings: List[LineString], target_bearing, crs="EPSG:4326"):
+    features = []
+    for linestring in linestrings:
         match = calculate_bearing_match_of_linestring(linestring, target_bearing)
         feature = Feature(geometry=linestring, properties={'match': match})
         features.append(feature)
@@ -70,3 +92,9 @@ def pairwise(iterable):
     a, b = tee(iterable)
     next(b, None)
     return zip(a, b)    
+
+
+if __name__ == '__main__':
+    star = create_linestring_star(num_lines=10)
+    fc = create_test_feature_collections(star, 45)
+    print(fc)
