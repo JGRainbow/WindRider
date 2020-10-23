@@ -1,16 +1,12 @@
 import requests
 
-key = 'vCGRsoADDTxbmamXfuvELPxlqVIv9nmN'
+WFS_ENDPOINT = "https://api.os.uk/features/v1/wfs"
+KEY = 'vCGRsoADDTxbmamXfuvELPxlqVIv9nmN'
 
-# bottom-left x, bottom-left y, top-right x, top-right y
-bounds = [51.0162, 0.9160, 52.1388, 1.1877]
-bbox = str(bounds[0]) + ',' + str(bounds[1]) + ',' + str(bounds[2]) + ',' + str(bounds[3])
-print(bbox)
-
-
-wfs_endpoint = "https://api.os.uk/features/v1/wfs"
+bbox = '51.0162,0.9160,51.0163,0.9268'
+# for i in range(0, 60): PAGE THROUGH THESE INSTEAD
 wfs_params = {
-    'key': key,
+    'key': KEY,
     'service': 'wfs',
     'version': '2.0.0',
     'request': 'GetFeature',
@@ -18,11 +14,14 @@ wfs_params = {
     'outputFormat': 'GeoJSON',
     'srsName': 'EPSG:4326',
     'bbox': bbox,
-    'count': 5
+    'count': 100
 }
-
-# working_url = "https://api.os.uk/features/v1/wfs?key=vCGRsoADDTxbmamXfuvELPxlqVIv9nmN&service=wfs&version=2.0.0&request=GetFeature&typeNames=Zoomstack_RoadsLocal&outputFormat=GeoJSON&srsName=EPSG:4326&count=5"
-
-response = requests.get(wfs_endpoint, params=wfs_params)
+response = requests.get(WFS_ENDPOINT, params=wfs_params)
 payload = response.json()
-print(payload)
+
+features = payload['features']
+
+if features:
+    print('Data Found')
+else:
+    print('No Data')

@@ -15,20 +15,34 @@ def get_open_roads_geojson_from_bbox(lat_north, lon_west, lat_south, lon_east,
                                      wfs_endpoint=WFS_ENDPOINT,
                                      key=KEY):
     bbox = create_bbox_string(lat_north, lon_west, lat_south, lon_east)
-    wfs_params = {
-        'key': key,
-        'service': 'wfs',
-        'version': '2.0.0',
-        'request': 'GetFeature',
-        'typeNames': 'Zoomstack_RoadsLocal',
-        'outputFormat': 'GeoJSON',
-        'srsName': 'EPSG:4326',
-        'bbox': bbox,
-        'count': 2000
-    }
-    response = requests.get(wfs_endpoint, params=wfs_params)
-    payload = response.json()
-    return payload
+    data_remaining = True
+    all_features = []
+    i = 0
+    while data_remaining:
+        print(i)
+        start_index = i * 100
+        wfs_params = {
+            'key': key,
+            'service': 'wfs',
+            'version': '2.0.0',
+            'startIndex': start_index,
+            'request': 'GetFeature',
+            'typeNames': 'Zoomstack_RoadsLocal',
+            'outputFormat': 'GeoJSON',
+            'srsName': 'EPSG:4326',
+            'bbox': bbox,
+            'count': 100
+        }
+        response = requests.get(wfs_endpoint, params=wfs_params)
+        payload = response.json()
+        features = payload['features']
+        data_remaining = len(features)
+        all_features.extend(features)
+        i += 1
+        if i > 100:
+            break
+    feature_collection = FeatureCollection(all_features, crs="EPSG:4326")
+    return feature_collection
 
 
 def convert_payload_to_geojson(payload, target_bearing):
