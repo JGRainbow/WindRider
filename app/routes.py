@@ -22,8 +22,8 @@ def map_func():
 
 @app.route('/data')
 def map_data():
-    TARGET_BEARING = 100
-    payload = get_open_roads_geojson_from_bbox(51.0162,0.9360,51.1188,1.03977)
+    TARGET_BEARING = 0
+    payload = get_open_roads_geojson_from_bbox(51.0162,0.9360,51.1188,1.09977)
     geojson = convert_payload_to_geojson(payload, target_bearing=TARGET_BEARING)
     return geojson
 
