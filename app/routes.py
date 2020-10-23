@@ -3,6 +3,7 @@ from app import app
 from app.osm_api import get_road_ways_from_bbox, get_road_nodes_from_bbox
 from app.angle_match import create_feature_collection
 from app.angle_match import create_test_feature_collections, create_linestring_star
+from app.os_api import get_open_roads_geojson_from_bbox, convert_payload_to_geojson
 
 
 @app.route('/')
@@ -21,12 +22,9 @@ def map_func():
 
 @app.route('/data')
 def map_data():
-    TARGET_BEARING = 90
-    nodes = get_road_nodes_from_bbox(51.0362,0.9360,51.1188,1.1677)
-    ways = get_road_ways_from_bbox(51.0362,0.9360,51.1188,1.1677)
-    # geojson = create_feature_collection(ways, nodes, TARGET_BEARING)
-    star = create_linestring_star(20)
-    geojson = create_test_feature_collections(star, TARGET_BEARING)
+    TARGET_BEARING = 100
+    payload = get_open_roads_geojson_from_bbox(51.0362,0.8360,51.1188,1.1677)
+    geojson = convert_payload_to_geojson(payload, target_bearing=TARGET_BEARING)
     return geojson
 
 

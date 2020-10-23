@@ -12,6 +12,7 @@
         // This function is called each time parser detects a new map object
         style: function (mapObject) {
         // Parsed geo objects could be styled using setStyle method
+        console.log('Reading GeoJSON...')
         if (mapObject instanceof H.map.Polygon) {
             console.log('Polygon Found!')
             mapObject.setStyle({
@@ -21,16 +22,21 @@
             });
         }
         else if (mapObject instanceof H.map.Polyline) {
+            console.log('Polyline Found!')
             data = mapObject.getData()
             console.log(data)
             console.log(data.properties.match)
             var match = data.properties.match
             mapObject.setStyle({
-            fillColor: `rgba(${255 * (1 - match)}, 0, 255, 0.8)`,
-            strokeColor: `rgba(${255 * (1 - match)}, 0, 255, 0.8)`,
+            fillColor: `rgba(${255 * (1 - match)}, ${255 * match}, 0, 0.8)`,
+            strokeColor: `rgba(${255 * (1 - match)}, ${255 * match}, 0, 0.8)`,
             lineWidth: 5
             });
         }
+        else {
+            console.log('No Data Found!')
+        };
+        // }
         }
     });
 

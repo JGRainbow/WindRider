@@ -70,7 +70,7 @@ def calculate_bearing_match_of_linestring(linestring: LineString, target_bearing
     polar_linestrings = convert_cartesian_linestring_to_polar_linestring(linestring)
     weighted_bearing, total_distance = 0, 0
     for segment in polar_linestrings:
-        weighted_bearing += abs(segment.distance * cos((180 * pi) * target_bearing - segment.bearing))
+        weighted_bearing += abs(segment.distance * cos((pi / 180) * (target_bearing - segment.bearing)))
         total_distance += segment.distance
     return weighted_bearing / total_distance
 
