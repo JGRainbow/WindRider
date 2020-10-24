@@ -24,6 +24,7 @@ def get_open_roads_geojson_from_bbox(lat_north, lon_west, lat_south, lon_east,
         i = 0
         while data_remaining:
             print(i)
+            print(bbox)
             start_index = i * 100
             wfs_params = {
                 'key': key,
@@ -38,6 +39,7 @@ def get_open_roads_geojson_from_bbox(lat_north, lon_west, lat_south, lon_east,
                 'count': 100
             }
             response = requests.get(wfs_endpoint, params=wfs_params)
+            print(response.url)
             payload = response.json()
             features = payload['features']
             data_remaining = len(features)
@@ -61,6 +63,11 @@ def convert_payload_to_geojson(payload, target_bearing):
     fc = FeatureCollection(matched_features, crs="EPSG:4326")    
     return fc
 
+# mapbox_url=
+# https://api.os.uk/features/v1/wfs?key=vCGRsoADDTxbmamXfuvELPxlqVIv9nmN&service=WFS&request=GetFeature&version=2.0.0&typeNames=Sites_FunctionalSite&outputFormat=GEOJSON&srsName=urn:ogc:def:crs:EPSG::4326&bbox=51.0162,0.916,51.1388,1.1877
+
+# working_url=
+# https://api.os.uk/features/v1/wfs?key=vCGRsoADDTxbmamXfuvELPxlqVIv9nmN&service=wfs&version=2.0.0&startIndex=100&request=GetFeature&typeNames=Zoomstack_RoadsLocal&outputFormat=GeoJSON&srsName=EPSG%3A4326&bbox=51.0162%2C0.916%2C51.1388%2C1.1877&count=100
 
 if __name__ == '__main__':
     bounds = [51.0162, 0.9160, 51.1388, 1.1877]

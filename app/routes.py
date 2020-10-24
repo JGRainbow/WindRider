@@ -28,9 +28,6 @@ def map_data():
     return geojson
 
 
-@app.route('/map2')
-def map_func2():
-    lat = request.args.get('lat', default=51.1, type=float)
-    lon = request.args.get('lon', default=1, type=float)
-    print(f'Lat: {lat} \t Lon: {lon}')
-    return render_template('map2.html', lat=lat, lon=lon, debug=True)   
+@app.route('/mapbox')
+def mapbox():
+    return render_template('mapbox.html')

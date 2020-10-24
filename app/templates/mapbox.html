@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OS Features API | BBOX Example | Mapbox GL JS</title>
+    <meta charset="utf-8" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <link rel="stylesheet" href="https://labs.os.uk/public/os-api-branding/v0.2.0/os-api-branding.css" />
+    <link rel="stylesheet" href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css" />
+    <style>
+        body { margin:0; padding:0; }
+        #map { position:absolute; top:0; bottom:0; width:100%; }
+        :focus { outline: none; }
+    </style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<script src="https://labs.os.uk/public/os-api-branding/v0.2.0/os-api-branding.js"></script>
+<script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.js"></script>
+<script src="https://npmcdn.com/@turf/turf/turf.min.js"></script>
+<script>
+
+    var apiKey = 'vCGRsoADDTxbmamXfuvELPxlqVIv9nmN';
+
+    var wfsServiceUrl = 'https://api.os.uk/features/v1/wfs',
+        tileServiceUrl = 'https://api.os.uk/maps/raster/v1/zxy';
+
+    // Create a map style object using the OS Maps API ZXY service.
+    var style = {
+        "version": 8,
+        "sources": {
+            "raster-tiles": {
+                "type": "raster",
+                "tiles": [ tileServiceUrl + "/Light_3857/{z}/{x}/{y}.png?key=" + apiKey ],
+                "tileSize": 256,
+                "maxzoom": 20
+            }
+        },
+        "layers": [{
+            "id": "os-maps-zxy",
+            "type": "raster",
+            "source": "raster-tiles"
+        }]
+    };
+
+    // Initialize the map object.
+    var map = new mapboxgl.Map({
+        container: 'map',
+        minZoom: 9,
+        maxZoom: 15,
+        style: style,
+        center: [ 0.916, 51.0162 ],
+        zoom: 11
+    });
+
+    map.dragRotate.disable(); // Disable map rotation using right click + drag.
+    map.touchZoomRotate.disableRotation(); // Disable map rotation using touch rotation gesture.
+
+    // Add navigation control (excluding compass button) to the map.
+    map.addControl(new mapboxgl.NavigationControl({
+        showCompass: true
+    }));
+
+    // Add event which waits for the map to be loaded.
+    map.on('load', function() {
+        // Add an empty GeoJSON layer for the roads features.
+        map.addLayer({
+            "id": "roads",
+            "type": "fill",
+            "source": {
+                "type": "geojson",
+                "data": {
+                    "type": "FeatureCollection",
+                    "features": []
+                }
+            },
+            "layout": {},
+            "paint": {
+                "fill-color": "#088",
+                "fill-opacity": 0.8
+            }
+        });
+
+        // Get the visible map bounds (BBOX).
+        var bounds = map.getBounds();
+
+        // Add event which will be triggered when the map has finshed moving (pan + zoom).
+        // Implements a simple strategy to only request data when the map viewport invalidates
+        // certain bounds.
+        map.on('moveend', function() {
+            var bounds1 = new mapboxgl.LngLatBounds(bounds.getSouthWest(), bounds.getNorthEast()),
+                bounds2 = map.getBounds();
+
+            if( JSON.stringify(bounds) !== JSON.stringify(bounds1.extend(bounds2)) ) {
+                bounds = bounds2;
+                getFeatures(bounds);
+            }
+        });
+
+        // When a click event occurs on a feature in the 'roads' layer, open a popup at
+        // the location of the click, with description HTML from its properties.
+        map.on('click', 'roads', function(e) {
+            new mapboxgl.Popup()
+                .setLngLat(e.lngLat)
+                .setHTML(e.features[0].properties.DistinctiveName1)
+                .addTo(map);
+        });
+
+        // Change the cursor to a pointer when the mouse is over the 'roads' layer.
+        map.on('mouseenter', 'roads', function() {
+            map.getCanvas().style.cursor = 'pointer';
+        });
+
+        // Change the cursor back to a pointer when it leaves the 'roads' layer.
+        map.on('mouseleave', 'roads', function() {
+            map.getCanvas().style.cursor = '';
+        });
+
+        getFeatures(bounds);
+    });
+
+    /**
+     * Get features from the WFS.
+     */
+    function getFeatures(bounds) {
+        // Convert the bounds to a formatted string.
+        var sw = bounds.getSouthWest().lat + ',' + bounds.getSouthWest().lng,
+            ne = bounds.getNorthEast().lat + ',' + bounds.getNorthEast().lng;
+
+        var coords = sw + ' ' + ne;
+
+        // Create an OGC XML filter parameter value which will select the road
+        // features (site function) intersecting the BBOX coordinates.
+        var xml = '<ogc:Filter>';
+        xml += '<ogc:And>';
+        xml += '<ogc:BBOX>';
+        xml += '<ogc:PropertyName>SHAPE</ogc:PropertyName>';
+        xml += '<gml:Box srsName="urn:ogc:def:crs:EPSG::4326">';
+        xml += '<gml:coordinates>' + coords + '</gml:coordinates>';
+        xml += '</gml:Box>';
+        xml += '</ogc:BBOX>';
+        xml += '<ogc:PropertyIsEqualTo>';
+        xml += '<ogc:PropertyName>SiteFunction</ogc:PropertyName>';
+        xml += '<ogc:Literal>Airport</ogc:Literal>';
+        xml += '</ogc:PropertyIsEqualTo>';
+        xml += '</ogc:And>';
+        xml += '</ogc:Filter>';
+
+        // Define (WFS) parameters object.
+        var wfsParams = {
+            key: apiKey,
+            service: 'WFS',
+            request: 'GetFeature',
+            version: '2.0.0',
+            typeNames: 'Zoomstack_RoadsLocal',
+            outputFormat: 'GEOJSON',
+            srsName: 'urn:ogc:def:crs:EPSG::4326',
+            // filter: xml
+            bbox: '51.0162,0.916,51.1388,1.1877'
+        };
+
+        // Use fetch() method to request GeoJSON data from the OS Features API.
+        // If successful - set the GeoJSON data for the 'roads' layer and re-render
+        // the map.
+        fetch(getUrl(wfsParams))
+            .then(response => response.json())
+            .then(data => {
+                // {Turf.js} Rewind polygons to follow the right-hand rule, i.e. exterior
+                // rings are counterclockwise and inner rings [holes] are clockwise; plus
+                // ensure the geometry has no self-intersections.
+                console.log('Data Received!')
+                console.log(data)
+                // var result = turf.unkinkPolygon(turf.rewind(data));
+                // map.getSource('airports').setData(result);
+                map.getSource('roads').setData(data);
+            });
+    }
+
+    /**
+     * Return URL with encoded parameters.
+     * @param {object} params - The parameters object to be encoded.
+     */
+    function getUrl(params) {
+        var encodedParameters = Object.keys(params)
+            .map(paramName => paramName + '=' + encodeURI(params[paramName]))
+            .join('&');
+
+        return wfsServiceUrl + '?' + encodedParameters;
+    }
+
+</script>
+
+</body>
+</html>
