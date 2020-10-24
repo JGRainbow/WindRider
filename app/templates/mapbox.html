@@ -1,20 +1,6 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>OS Features API | BBOX Example | Mapbox GL JS</title>
-    <meta charset="utf-8" />
-    <meta name="referrer" content="strict-origin-when-cross-origin" />
-    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
-    <link rel="stylesheet" href="https://labs.os.uk/public/os-api-branding/v0.2.0/os-api-branding.css" />
-    <link rel="stylesheet" href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css" />
-    <style>
-        body { margin:0; padding:0; }
-        #map { position:absolute; top:0; bottom:0; width:100%; }
-        :focus { outline: none; }
-    </style>
-</head>
-<body>
+{% extends "mapbox_base.html" %}
 
+{% block content %}
 <div id="map"></div>
 
 <script src="https://labs.os.uk/public/os-api-branding/v0.2.0/os-api-branding.js"></script>
@@ -68,7 +54,7 @@
         // Add an empty GeoJSON layer for the roads features.
         map.addLayer({
             "id": "roads",
-            "type": "fill",
+            "type": "line",
             "source": {
                 "type": "geojson",
                 "data": {
@@ -76,10 +62,13 @@
                     "features": []
                 }
             },
-            "layout": {},
+            "layout": {
+                "line-join": "round",
+                "line-cap": "round"
+            },
             "paint": {
-                "fill-color": "#088",
-                "fill-opacity": 0.8
+                "line-color": "#088",
+                "line-width": 2
             }
         });
 
@@ -129,7 +118,8 @@
         var sw = bounds.getSouthWest().lat + ',' + bounds.getSouthWest().lng,
             ne = bounds.getNorthEast().lat + ',' + bounds.getNorthEast().lng;
 
-        var coords = sw + ' ' + ne;
+        // var coords = sw + ' ' + ne;
+        var coords = sw + ',' + ne;
 
         // Create an OGC XML filter parameter value which will select the road
         // features (site function) intersecting the BBOX coordinates.
@@ -157,10 +147,8 @@
             typeNames: 'Zoomstack_RoadsLocal',
             outputFormat: 'GEOJSON',
             srsName: 'urn:ogc:def:crs:EPSG::4326',
-            // filter: xml
-            bbox: '51.0162,0.916,51.1388,1.1877'
+            bbox: coords
         };
-
         // Use fetch() method to request GeoJSON data from the OS Features API.
         // If successful - set the GeoJSON data for the 'roads' layer and re-render
         // the map.
@@ -172,10 +160,22 @@
                 // ensure the geometry has no self-intersections.
                 console.log('Data Received!')
                 console.log(data)
+
+                var greeting = '{{ clever_function('Jacob') }}';
+                console.log(greeting)
+                // `rgba(${255 * (1 - match)}, ${255 * match}, 0, 0.8)`,
+                // console.log(python_data)
                 // var result = turf.unkinkPolygon(turf.rewind(data));
                 // map.getSource('airports').setData(result);
                 map.getSource('roads').setData(data);
             });
+        // fetch('data')
+        //     .then(response => response.json())
+        //     .then(data => {
+        //         console.log('Data Received!')
+        //         console.log(data)
+        //         map.getSource('roads').setData(data);
+        //     });
     }
 
     /**
@@ -192,5 +192,4 @@
 
 </script>
 
-</body>
-</html>
+{% endblock %}

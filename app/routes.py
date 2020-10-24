@@ -30,4 +30,7 @@ def map_data():
 
 @app.route('/mapbox')
 def mapbox():
-    return render_template('mapbox.html')
+    return render_template('mapbox.html', convert_payload_to_geojson=convert_payload_to_geojson)
+
+# Feed mapbox the coords of bbox, then generate geojson, then pass that to render_template?
+# What happens when map moves?
