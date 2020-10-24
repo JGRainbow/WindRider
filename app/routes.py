@@ -28,9 +28,25 @@ def map_data():
     return geojson
 
 
-@app.route('/mapbox')
+# http://127.0.0.1:5000/mapbox/?s=50.93816400806824&w=0.747428527832767&n=51.094104887057256&e=1.084571472168534
+# @app.route('/mapbox')
+@app.route('/mapbox', methods=['GET', 'POST'])
 def mapbox():
-    return render_template('mapbox.html', convert_payload_to_geojson=convert_payload_to_geojson)
+    TARGET_BEARING = 90
+    south = request.args.get('s', default=50.96928265860532, type=float)
+    west = request.args.get('w', default=0.8317945347608031, type=float)
+    north = request.args.get('n', default=51.06107512796291, type=int)
+    east = request.args.get('e', default=1.030244874246165, type=int)
+    payload = get_open_roads_geojson_from_bbox(south, west, north, east)
+    geojson = convert_payload_to_geojson(payload, target_bearing=TARGET_BEARING)
+    return render_template('mapbox.html', south=south, west=west, north=north, east=east, geojson=geojson)
 
-# Feed mapbox the coords of bbox, then generate geojson, then pass that to render_template?
-# What happens when map moves?
+
+@app.route('/test')
+def get_position():
+    lon = request.args.get('lon', default=0.9, type=float)
+    lat = request.args.get('lat', default=51, type=float)
+    zoom = request.args.get('zoom', default=5, type=int)
+    return render_template('test.html', lon=lon, lat=lat, zoom=zoom)
+
+

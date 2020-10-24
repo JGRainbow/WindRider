@@ -37,7 +37,8 @@
         minZoom: 9,
         maxZoom: 15,
         style: style,
-        center: [ 0.916, 51.0162 ],
+        center: [ 0.916, 51.0162 ], 
+        // The centre and zoom needs to update!
         zoom: 11
     });
 
@@ -81,6 +82,18 @@
         map.on('moveend', function() {
             var bounds1 = new mapboxgl.LngLatBounds(bounds.getSouthWest(), bounds.getNorthEast()),
                 bounds2 = map.getBounds();
+            var southWest = bounds.getSouthWest();
+            var northEast = bounds.getNorthEast();
+            var south = southWest.lat;
+            var west = southWest.lng;
+            var north = northEast.lat;
+            var east = northEast.lng;
+            var s = {{ south }};
+            console.log('Original South Value: ', s)
+            // Hard code this for now
+            var newUrl = 'http://127.0.0.1:5000/mapbox?s=' + south + '&w=' + west + '&n=' + north + '&e=' + east;
+            console.log(newUrl)
+            window.location.href = newUrl;
 
             if( JSON.stringify(bounds) !== JSON.stringify(bounds1.extend(bounds2)) ) {
                 bounds = bounds2;
@@ -144,7 +157,7 @@
             service: 'WFS',
             request: 'GetFeature',
             version: '2.0.0',
-            typeNames: 'Zoomstack_RoadsLocal',
+            typeNames: 'Zoomstack_RoadsNational',
             outputFormat: 'GEOJSON',
             srsName: 'urn:ogc:def:crs:EPSG::4326',
             bbox: coords
@@ -159,15 +172,20 @@
                 // rings are counterclockwise and inner rings [holes] are clockwise; plus
                 // ensure the geometry has no self-intersections.
                 console.log('Data Received!')
-                console.log(data)
-
-                var greeting = '{{ clever_function('Jacob') }}';
-                console.log(greeting)
+                // console.log(data)
+                const input_geojson = '{{ geojson }}';
+                const add_quotes_geojson = input_geojson.replaceAll('&#34;', '"');
+                const output_geojson = JSON.parse(add_quotes_geojson);
+                // const output_geojson = decodeURI(input_geojson);
+                // const output_geojson = JSON.parse(input_geojson);
+                console.log(output_geojson)
+                // var greeting = '{{ clever_function('Jacob') }}';
+                // console.log(greeting)
                 // `rgba(${255 * (1 - match)}, ${255 * match}, 0, 0.8)`,
                 // console.log(python_data)
                 // var result = turf.unkinkPolygon(turf.rewind(data));
                 // map.getSource('airports').setData(result);
-                map.getSource('roads').setData(data);
+                map.getSource('roads').setData(output_geojson);
             });
         // fetch('data')
         //     .then(response => response.json())
