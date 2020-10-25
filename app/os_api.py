@@ -59,7 +59,9 @@ def convert_payload_to_geojson(payload, target_bearing):
         coordinates = f['geometry']['coordinates'][0]
         linestring = LineString(coordinates)
         match = calculate_bearing_match_of_linestring(linestring, target_bearing)
-        match_feature = Feature(geometry=LineString(coordinates), properties={'match': match})
+        match_feature = Feature(geometry=LineString(coordinates), properties={'match': match,
+                                                                              'color': f'rgba({255 * (1 - match)},\
+                                                                                              {255 * match}, 0, 0.8)'})
         matched_features.append(match_feature)
     fc = FeatureCollection(matched_features, crs="EPSG:4326")    
     return fc

@@ -69,8 +69,9 @@
                 "line-cap": "round"
             },
             "paint": {
-                "line-color": "#088",
-                "line-width": 2
+                // "line-color": "#088",
+                "line-color": ['get', 'color'],
+                "line-width": 3,
             }
         });
 
@@ -133,22 +134,6 @@
         // var coords = sw + ' ' + ne;
         var coords = sw + ',' + ne;
 
-        // Create an OGC XML filter parameter value which will select the road
-        // features (site function) intersecting the BBOX coordinates.
-        var xml = '<ogc:Filter>';
-        xml += '<ogc:And>';
-        xml += '<ogc:BBOX>';
-        xml += '<ogc:PropertyName>SHAPE</ogc:PropertyName>';
-        xml += '<gml:Box srsName="urn:ogc:def:crs:EPSG::4326">';
-        xml += '<gml:coordinates>' + coords + '</gml:coordinates>';
-        xml += '</gml:Box>';
-        xml += '</ogc:BBOX>';
-        xml += '<ogc:PropertyIsEqualTo>';
-        xml += '<ogc:PropertyName>SiteFunction</ogc:PropertyName>';
-        xml += '<ogc:Literal>Airport</ogc:Literal>';
-        xml += '</ogc:PropertyIsEqualTo>';
-        xml += '</ogc:And>';
-        xml += '</ogc:Filter>';
 
         // Define (WFS) parameters object.
         var wfsParams = {
