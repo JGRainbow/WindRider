@@ -16,7 +16,7 @@ GEODESIC = pyproj.Geod(ellps='WGS84')
 def get_centre_and_zoom_of_bbox(south: float, west: float,
                                 north: float, east: float):
     centre = [str(np.mean([west, east])), str(np.mean([north, south]))]
-    zoom = 11 # Hard-code for now
+    zoom = 13 # Hard-code for now
     return centre, zoom
 
 

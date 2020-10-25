@@ -16,10 +16,10 @@ def get_open_roads_geojson_from_bbox(lat_north, lon_west, lat_south, lon_east,
                                      key=KEY):
     bbox = create_bbox_string(lat_north, lon_west, lat_south, lon_east)
     all_features = []
-    # for product in ('Zoomstack_RoadsLocal',
-    #                  'Zoomstack_RoadsRegional',
-    #                  'Zoomstack_RoadsNational'):
-    for product in ['Zoomstack_RoadsNational']:
+    for product in ('Zoomstack_RoadsLocal',
+                     'Zoomstack_RoadsRegional',
+                     'Zoomstack_RoadsNational'):
+    # for product in ['Zoomstack_RoadsNational']:
         print(f'Getting data from {product}...')
         data_remaining = True
         i = 0
@@ -40,7 +40,6 @@ def get_open_roads_geojson_from_bbox(lat_north, lon_west, lat_south, lon_east,
                 'count': 100
             }
             response = requests.get(wfs_endpoint, params=wfs_params)
-            print(response.url)
             payload = response.json()
             features = payload['features']
             data_remaining = len(features)

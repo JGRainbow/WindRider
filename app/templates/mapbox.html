@@ -30,13 +30,13 @@
             "source": "raster-tiles"
         }]
     };
-
-    // const centre = {{ centre }}
     
     // Initialize the map object.
     var map = new mapboxgl.Map({
         container: 'map',
-        minZoom: 9,
+        // minZoom: 9,
+        // maxZoom: 15,
+        minZoom: 13,
         maxZoom: 15,
         style: style,
         center: [{{ centre[0] }}, {{ centre[1] }}],
@@ -155,29 +155,12 @@
                 // {Turf.js} Rewind polygons to follow the right-hand rule, i.e. exterior
                 // rings are counterclockwise and inner rings [holes] are clockwise; plus
                 // ensure the geometry has no self-intersections.
-                console.log('Data Received!')
-                // console.log(data)
                 const input_geojson = '{{ geojson }}';
                 const add_quotes_geojson = input_geojson.replaceAll('&#34;', '"');
                 const output_geojson = JSON.parse(add_quotes_geojson);
-                // const output_geojson = decodeURI(input_geojson);
-                // const output_geojson = JSON.parse(input_geojson);
                 console.log(output_geojson)
-                // var greeting = '{{ clever_function('Jacob') }}';
-                // console.log(greeting)
-                // `rgba(${255 * (1 - match)}, ${255 * match}, 0, 0.8)`,
-                // console.log(python_data)
-                // var result = turf.unkinkPolygon(turf.rewind(data));
-                // map.getSource('airports').setData(result);
                 map.getSource('roads').setData(output_geojson);
             });
-        // fetch('data')
-        //     .then(response => response.json())
-        //     .then(data => {
-        //         console.log('Data Received!')
-        //         console.log(data)
-        //         map.getSource('roads').setData(data);
-        //     });
     }
 
     /**
