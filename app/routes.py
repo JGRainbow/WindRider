@@ -38,7 +38,7 @@ def mapbox():
     north = request.args.get('n', default=51.06107512796291, type=float)
     east = request.args.get('e', default=1.030244874246165, type=float)
     centre, zoom = get_centre_and_zoom_of_bbox(south, west, north, east)
-    print(f'New Centre: \t {centre}')
+    # print(f'New Centre: \t {centre}')
     payload = get_open_roads_geojson_from_bbox(south, west, north, east)
     geojson = convert_payload_to_geojson(payload, target_bearing=TARGET_BEARING)
     return render_template('mapbox.html', south=south, west=west, north=north, east=east,
