@@ -13,6 +13,13 @@ PolarCoord = namedtuple('PolarCoord', 'bearing distance')
 GEODESIC = pyproj.Geod(ellps='WGS84')
 
 
+def get_centre_and_zoom_of_bbox(south: float, west: float,
+                                north: float, east: float):
+    centre = [str(np.mean([west, east])), str(np.mean([north, south]))]
+    zoom = 11 # Hard-code for now
+    return centre, zoom
+
+
 def create_linestring_from_way(way: overpy.Way, nodes):
     node_id_list = get_all_node_ids_on_way(way)
     node_list = select_nodes_from_node_ids(nodes, node_id_list)
