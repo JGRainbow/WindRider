@@ -1,1 +1,1 @@
-gunicorn windrider:app
+web: gunicorn windrider:app
