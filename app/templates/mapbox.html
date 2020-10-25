@@ -92,9 +92,11 @@
             var east = northEast.lng;
             // Hard code this for now
             var oldUrl = window.location.href;
+            var prefix = oldUrl.split('?')[0]; 
             var suffix = 's=' + south + '&w=' + west + '&n=' + north + '&e=' + east;
-            var newUrl = 'https://windrider.herokuapp.com/mapbox?' + suffix;
-            // window.location.href = newUrl;
+            var newUrl = prefix + '?' + suffix;
+            // var newUrl = 'https://windrider.herokuapp.com/mapbox?' + suffix;
+            window.location.href = newUrl;
 
             if( JSON.stringify(bounds) !== JSON.stringify(bounds1.extend(bounds2)) ) {
                 bounds = bounds2;
