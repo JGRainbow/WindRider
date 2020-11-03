@@ -31,3 +31,17 @@ def mapbox():
     return render_template('mapbox.html', south=south, west=west, north=north, east=east,
                            centre=centre, zoom=zoom, geojson=geojson, debug=True)
 
+
+@app.route('/knob2')
+def knob2():
+    return render_template('knob2.html')
+
+
+@app.route('/slider')
+def slider():
+    return render_template('slider.html')
+
+
+@app.route('/rotary_dial')
+def rotary_dial():
+    return render_template('rotary_dial.html')

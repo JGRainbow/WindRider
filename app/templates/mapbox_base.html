@@ -1,3 +1,11 @@
+{% extends 'bootstrap/base.html' %}
+
+<style>
+    body { margin:0; padding:0; }
+    #map { position:absolute; top:0; bottom:100; width:100%; }
+    #bearing-slider { margin:5; position:absolute; bottom:5; width:100%; }
+    :focus { outline: none; }
+</style>
 <html>
     <head>
         <title>WindRider</title>
@@ -8,7 +16,8 @@
         <link rel="stylesheet" href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css" />
         <style>
             body { margin:0; padding:0; }
-            #map { position:absolute; top:0; bottom:0; width:100%; }
+            #map { position:absolute; top:0; bottom:100; width:100%; }
+            #bearing-slider { margin:5; position:absolute; bottom:5; width:100%; }
             :focus { outline: none; }
         </style>
     </head>        

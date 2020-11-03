@@ -178,4 +178,21 @@
 
 </script>
 
+
+<form class="range-field my-4 w-100" id='bearing-slider'>
+  <input type="range" min="0" max="360" />
+</form>
+
+<script>
+    $(document).ready(function(){
+        $(".range-field my-4 w-100").click(function(){
+        //   var bearing = $("h2").hide();
+        var bearing = document.getElementById('bearing-slider').value;
+        console.log(bearing)
+        });
+    });
+
+</script>
+
+
 {% endblock %}
