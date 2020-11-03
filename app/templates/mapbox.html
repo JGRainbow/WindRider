@@ -90,9 +90,10 @@
             var west = southWest.lng;
             var north = northEast.lat;
             var east = northEast.lng;
-            // Hard code this for now
-            var newUrl = 'http://127.0.0.1:5000/mapbox?s=' + south + '&w=' + west + '&n=' + north + '&e=' + east;
-            console.log(newUrl)
+            var oldUrl = window.location.href;
+            var prefix = oldUrl.split('?')[0]; 
+            var suffix = 's=' + south + '&w=' + west + '&n=' + north + '&e=' + east;
+            var newUrl = prefix + '?' + suffix;
             window.location.href = newUrl;
 
             if( JSON.stringify(bounds) !== JSON.stringify(bounds1.extend(bounds2)) ) {
@@ -176,5 +177,22 @@
     }
 
 </script>
+
+
+<form class="range-field my-4 w-100" id='bearing-slider'>
+  <input type="range" min="0" max="360" />
+</form>
+
+<script>
+    $(document).ready(function(){
+        $(".range-field my-4 w-100").click(function(){
+        //   var bearing = $("h2").hide();
+        var bearing = document.getElementById('bearing-slider').value;
+        console.log(bearing)
+        });
+    });
+
+</script>
+
 
 {% endblock %}

@@ -39,7 +39,7 @@ def create_feature_collection(ways, nodes, target_bearing, crs="EPSG:4326"):
     fc = FeatureCollection(features, crs=crs)
     return fc
 
-# `rgba(${255 * (1 - match)}, ${255 * match}, 0, 0.8)`,
+
 def create_linestring_star(num_lines, centre_lon=0.958577, centre_lat=51.109754, length=0.025):
     linestrings = []
     for angle in np.arange(0, 360, 360 / num_lines):
